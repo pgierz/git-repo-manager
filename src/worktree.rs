@@ -5,6 +5,95 @@ use super::repo;
 
 pub const GIT_MAIN_WORKTREE_DIRECTORY: &str = ".git-main-working-tree";
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+    use std::process::Command;
+    use tempdir::TempDir;
+
+    fn init_empty_repo() -> PathBuf {
+        let directory = TempDir::new("grm-worktree").unwrap();
+        Command::new("git")
+            .args(["init", "."])
+            .current_dir(directory.path())
+            .output()
+            .unwrap();
+        Command::new("touch")
+            .args(["test"])
+            .current_dir(directory.path())
+            .output()
+            .unwrap();
+        Command::new("git")
+            .args(["add", "test"])
+            .current_dir(directory.path())
+            .output()
+            .unwrap();
+        Command::new("git")
+            .args(["commit", "-m", "Initial commit"])
+            .current_dir(directory.path())
+            .output()
+            .unwrap();
+        Command::new("bash")
+            .args(["-c", "git ls-files | xargs rm -rf"])
+            .current_dir(directory.path())
+            .output()
+            .unwrap();
+        Command::new("mv")
+            .args([".git", GIT_MAIN_WORKTREE_DIRECTORY])
+            .current_dir(directory.path())
+            .output()
+            .unwrap();
+        Command::new("git")
+            .args([
+                "--git-dir",
+                GIT_MAIN_WORKTREE_DIRECTORY,
+                "config",
+                "core.bare",
+                "true",
+            ])
+            .current_dir(directory.path())
+            .output()
+            .unwrap();
+        directory.into_path()
+    }
+
+    #[test]
+    fn add_new_worktree() {
+        let repo_path = init_empty_repo();
+
+        let out = add_worktree(&repo_path, "test", None, None, true);
+        assert!(out.is_ok());
+        let repo = git2::Repository::open(repo_path.join("test")).unwrap();
+        assert_eq!(repo.head().unwrap().shorthand().unwrap(), "test");
+        assert!(repo
+            .find_branch("test", git2::BranchType::Local)
+            .unwrap()
+            .upstream()
+            .is_err());
+    }
+
+    #[test]
+    fn add_new_worktree_with_remote_track() {
+        let repo_path = init_empty_repo();
+
+        let out = add_worktree(&repo_path, "test", None, Some(("origin", "test")), true);
+        assert!(out.is_ok());
+        let repo = git2::Repository::open(repo_path.join("test")).unwrap();
+        assert_eq!(repo.head().unwrap().shorthand().unwrap(), "test");
+        assert_eq!(
+            repo.find_branch("test", git2::BranchType::Local)
+                .unwrap()
+                .upstream()
+                .unwrap()
+                .name()
+                .unwrap()
+                .unwrap(),
+            "test"
+        );
+    }
+}
+
 // The logic about the base branch and the tracking branch is as follows:
 //
 // * If a branch with the same name does not exist and no track is given, use the default
