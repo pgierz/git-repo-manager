@@ -63,13 +63,9 @@ def test_worktree_add(
         config_has_default_track_enabled,
     ) = config_setup
     (local_branch_exists, local_branch_has_tracking_branch) = local_branch_setup
-    has_remotes = True if remote_count > 0 else False
+    has_remotes = remote_count > 0
 
-    if worktree_with_slash:
-        worktree_name = "dir/nested/test"
-    else:
-        worktree_name = "test"
-
+    worktree_name = "dir/nested/test" if worktree_with_slash else "test"
     if track_differs_from_existing_branch_upstream:
         explicit_track_branch_name = f"{default_remote}/somethingelse"
     else:
@@ -167,7 +163,7 @@ def test_worktree_add(
                 str(remote_branch_with_prefix_already_exists),
                 str(remote_count),
                 str(remotes_differ),
-                str(worktree_name),
+                worktree_name,
             ]
         )
 
@@ -182,7 +178,7 @@ def test_worktree_add(
             str(remote_branch_with_prefix_already_exists),
             str(remote_count),
             str(remotes_differ),
-            str(worktree_name),
+            worktree_name,
         ]
     )
 

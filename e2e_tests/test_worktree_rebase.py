@@ -109,10 +109,6 @@ def test_worktree_rebase(pull, rebase, ffable, has_changes, stash):
             assert (
                 repo.refs.myfeatbranch.commit.message.strip() == "commit-in-feat-local"
             )
-            assert (
-                repo.remote("origin").refs.myfeatbranch.commit.message.strip()
-                == "commit-in-feat-remote"
-            )
         else:
             assert (
                 repo.commit("mybasebranch").message.strip()
@@ -134,11 +130,10 @@ def test_worktree_rebase(pull, rebase, ffable, has_changes, stash):
                 repo.remote("origin").refs.mybasebranch.commit.message.strip()
                 == "commit-in-base-remote"
             )
-            assert (
-                repo.remote("origin").refs.myfeatbranch.commit.message.strip()
-                == "commit-in-feat-remote"
-            )
-
+        assert (
+            repo.remote("origin").refs.myfeatbranch.commit.message.strip()
+            == "commit-in-feat-remote"
+        )
         args = ["wt", "rebase"]
         if pull:
             args += ["--pull"]
@@ -220,11 +215,6 @@ def test_worktree_rebase(pull, rebase, ffable, has_changes, stash):
                             repo.commit("HEAD~2").message.strip()
                             == "commit-in-base-remote"
                         )
-                        assert (
-                            repo.commit("HEAD~3").message.strip()
-                            == "commit-in-base-local"
-                        )
-                        assert repo.commit("HEAD~4").message.strip() == "commit-root"
                     else:
                         assert cmd.returncode != 0
                         assert (
@@ -239,11 +229,11 @@ def test_worktree_rebase(pull, rebase, ffable, has_changes, stash):
                             repo.commit("HEAD~2").message.strip()
                             == "commit-in-base-local-no-ff"
                         )
-                        assert (
-                            repo.commit("HEAD~3").message.strip()
-                            == "commit-in-base-local"
-                        )
-                        assert repo.commit("HEAD~4").message.strip() == "commit-root"
+                    assert (
+                        repo.commit("HEAD~3").message.strip()
+                        == "commit-in-base-local"
+                    )
+                    assert repo.commit("HEAD~4").message.strip() == "commit-root"
             else:
                 assert cmd.returncode == 0
                 if ffable:

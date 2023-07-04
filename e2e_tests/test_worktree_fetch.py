@@ -146,9 +146,6 @@ def test_worktree_pull(rebase, ffable, has_changes, stash):
                                 repo.commit("master").hexsha
                                 == repo.commit("upstream/master").hexsha
                             )
-                            assert (
-                                repo.commit("upstream/master").hexsha == remote_commit
-                            )
                         else:
                             assert cmd.returncode != 0
                             assert "cannot be fast forwarded" in cmd.stderr
@@ -157,9 +154,9 @@ def test_worktree_pull(rebase, ffable, has_changes, stash):
                                 != repo.commit("origin/master").hexsha
                             )
                             assert repo.commit("master").hexsha != remote_commit
-                            assert (
-                                repo.commit("upstream/master").hexsha == remote_commit
-                            )
+                        assert (
+                            repo.commit("upstream/master").hexsha == remote_commit
+                        )
                     else:
                         assert cmd.returncode == 0
                         if ffable:

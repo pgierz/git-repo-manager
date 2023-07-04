@@ -170,9 +170,7 @@ class TempGitRemote:
             """
             )
             newobj = cls(tmpdir)
-            remoteid = None
-            if initfunc is not None:
-                remoteid = newobj.init(initfunc)
+            remoteid = newobj.init(initfunc) if initfunc is not None else None
             newobj.remoteid = remoteid
             return newobj, remoteid
         else:

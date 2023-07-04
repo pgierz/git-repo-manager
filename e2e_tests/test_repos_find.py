@@ -146,7 +146,7 @@ def test_repos_find(configtype, exclude, default_format):
             assert someremote["url"] == "ssh://example.com/repo2.git"
 
             if exclude == "^.*/repo2$":
-                assert [r for r in tree["repos"] if r["name"] == "repo2"] == []
+                assert not [r for r in tree["repos"] if r["name"] == "repo2"]
             else:
                 repo2 = [r for r in tree["repos"] if r["name"] == "repo2"][0]
                 assert repo2["worktree_setup"] is False

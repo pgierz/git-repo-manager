@@ -239,7 +239,7 @@ def test_repos_sync_config_is_valid_symlink(configtype):
                     with git.Repo(git_dir) as repo:
                         assert not repo.bare
                         assert not repo.is_dirty()
-                        assert set([str(r) for r in repo.remotes]) == {"origin"}
+                        assert {str(r) for r in repo.remotes} == {"origin"}
                         assert str(repo.active_branch) == "master"
                         assert str(repo.head.commit) == head_commit_sha
 
@@ -298,9 +298,7 @@ def test_repos_sync_unmanaged_repos(configtype):
                 # this removes the prefix (root) from the path (unmanaged_repo)
                 unmanaged_repo_name = os.path.relpath(unmanaged_repo, root)
                 regex = f".*unmanaged.*{unmanaged_repo_name}"
-                assert any(
-                    [re.match(regex, line) for line in cmd.stderr.lower().split("\n")]
-                )
+                assert any(re.match(regex, line) for line in cmd.stderr.lower().split("\n"))
 
 
 @pytest.mark.parametrize("configtype", ["toml", "yaml"])
@@ -336,10 +334,7 @@ def test_repos_sync_normal_clone(configtype):
                     with git.Repo(git_dir) as repo:
                         assert not repo.bare
                         assert not repo.is_dirty()
-                        assert set([str(r) for r in repo.remotes]) == {
-                            "origin",
-                            "origin2",
-                        }
+                        assert {str(r) for r in repo.remotes} == {     "origin",     "origin2", }
                         assert str(repo.active_branch) == "master"
                         assert str(repo.head.commit) == remote1_head_commit_sha
 
@@ -373,7 +368,7 @@ def test_repos_sync_repo_in_subdirectory(configtype):
                 with git.Repo(git_dir) as repo:
                     assert not repo.bare
                     assert not repo.is_dirty()
-                    assert set([str(r) for r in repo.remotes]) == {"origin"}
+                    assert {str(r) for r in repo.remotes} == {"origin"}
                     assert str(repo.active_branch) == "master"
                     assert str(repo.head.commit) == remote_head_commit_sha
 
@@ -407,7 +402,7 @@ def test_repos_sync_nested_clone(configtype):
                         with git.Repo(git_dir) as repo:
                             assert not repo.bare
                             assert not repo.is_dirty()
-                            assert set([str(r) for r in repo.remotes]) == {"origin"}
+                            assert {str(r) for r in repo.remotes} == {"origin"}
                             assert str(repo.active_branch) == "master"
                             assert str(repo.head.commit) == sha
 
@@ -473,7 +468,7 @@ def test_repos_sync_normal_add_remote(configtype):
                     with git.Repo(git_dir) as repo:
                         assert not repo.bare
                         assert not repo.is_dirty()
-                        assert set([str(r) for r in repo.remotes]) == {"origin"}
+                        assert {str(r) for r in repo.remotes} == {"origin"}
                         assert str(repo.active_branch) == "master"
                         assert str(repo.head.commit) == remote1_head_commit_sha
 
@@ -487,10 +482,7 @@ def test_repos_sync_normal_add_remote(configtype):
                     cmd = grm(["repos", "sync", "config", "--config", config.name])
                     assert cmd.returncode == 0
                     with git.Repo(git_dir) as repo:
-                        assert set([str(r) for r in repo.remotes]) == {
-                            "origin",
-                            "origin2",
-                        }
+                        assert {str(r) for r in repo.remotes} == {     "origin",     "origin2", }
 
                         urls = list(repo.remote("origin").urls)
                         assert len(urls) == 1
@@ -523,10 +515,7 @@ def test_repos_sync_normal_remove_remote(configtype):
                     with git.Repo(git_dir) as repo:
                         assert not repo.bare
                         assert not repo.is_dirty()
-                        assert set([str(r) for r in repo.remotes]) == {
-                            "origin",
-                            "origin2",
-                        }
+                        assert {str(r) for r in repo.remotes} == {     "origin",     "origin2", }
                         assert str(repo.active_branch) == "master"
                         assert str(repo.head.commit) == remote1_head_commit_sha
 
@@ -588,7 +577,7 @@ def test_repos_sync_normal_change_remote_url(configtype):
                     with git.Repo(git_dir) as repo:
                         assert not repo.bare
                         assert not repo.is_dirty()
-                        assert set([str(r) for r in repo.remotes]) == {"origin"}
+                        assert {str(r) for r in repo.remotes} == {"origin"}
                         assert str(repo.active_branch) == "master"
                         assert str(repo.head.commit) == remote1_head_commit_sha
 
@@ -602,7 +591,7 @@ def test_repos_sync_normal_change_remote_url(configtype):
                     cmd = grm(["repos", "sync", "config", "--config", config.name])
                     assert cmd.returncode == 0
                     with git.Repo(git_dir) as repo:
-                        assert set([str(r) for r in repo.remotes]) == {"origin"}
+                        assert {str(r) for r in repo.remotes} == {"origin"}
 
                         urls = list(repo.remote("origin").urls)
                         assert len(urls) == 1
@@ -631,7 +620,7 @@ def test_repos_sync_normal_change_remote_name(configtype):
                     with git.Repo(git_dir) as repo:
                         assert not repo.bare
                         assert not repo.is_dirty()
-                        assert set([str(r) for r in repo.remotes]) == {"origin"}
+                        assert {str(r) for r in repo.remotes} == {"origin"}
                         assert str(repo.active_branch) == "master"
                         assert str(repo.head.commit) == remote1_head_commit_sha
 
@@ -674,7 +663,7 @@ def test_repos_sync_worktree_clone(configtype, init_worktree):
                 if init_worktree is False:
                     args.append("--init-worktree=false")
 
-                for i in [1, 2]:
+                for _ in [1, 2]:
                     cmd = grm(args)
                     assert cmd.returncode == 0
 
@@ -692,10 +681,10 @@ def test_repos_sync_worktree_clone(configtype, init_worktree):
                         }
 
                     with git.Repo(
-                        os.path.join(worktree_dir, ".git-main-working-tree")
-                    ) as repo:
+                                            os.path.join(worktree_dir, ".git-main-working-tree")
+                                        ) as repo:
                         assert repo.bare
-                        assert set([str(r) for r in repo.remotes]) == {"origin"}
+                        assert {str(r) for r in repo.remotes} == {"origin"}
                         assert str(repo.active_branch) == "master"
                         assert str(repo.head.commit) == head_commit_sha
 
