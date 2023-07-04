@@ -47,7 +47,7 @@ for tier in ["dependencies", "dev-dependencies"]:
     for name, dependency in cargo[tier].items():
         version = dependency["version"].lstrip("=")
         if len(name) >= 4:
-            info_file = f"{INDEX_DIR}/{name[0:2]}/{name[2:4]}/{name}"
+            info_file = f"{INDEX_DIR}/{name[:2]}/{name[2:4]}/{name}"
         elif len(name) == 3:
             info_file = f"{INDEX_DIR}/3/{name[0]}/{name}"
         elif len(name) == 2:
@@ -58,7 +58,7 @@ for tier in ["dependencies", "dev-dependencies"]:
         current_version = semver.VersionInfo.parse(version)
 
         latest_version = None
-        for version_entry in open(info_file, "r").readlines():
+        for version_entry in open(info_file, "r"):
             version = semver.VersionInfo.parse(json.loads(version_entry)["vers"])
             if latest_version is None or version > latest_version:
                 if (

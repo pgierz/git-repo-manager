@@ -307,10 +307,7 @@ def test_repos_find_remote_user(
             "--root",
             "/myroot",
         ]
-        if use_owner:
-            args += ["--owner"]
-        else:
-            args += ["--user", "myuser1"]
+        args += ["--owner"] if use_owner else ["--user", "myuser1"]
         if force_ssh:
             args += ["--force-ssh"]
         if override_remote_name:
@@ -543,19 +540,19 @@ def test_repos_find_remote_group(
         assert isinstance(repo["remotes"], list)
         assert len(repo["remotes"]) == 1
         if force_ssh or i == 1:
-            assert repo["remotes"][0]["name"] == "origin"
             assert (
                 repo["remotes"][0]["url"]
                 == f"ssh://git@example.com/mygroup1/myproject{i}.git"
             )
             assert repo["remotes"][0]["type"] == "ssh"
         else:
-            assert repo["remotes"][0]["name"] == "origin"
             assert (
                 repo["remotes"][0]["url"]
                 == f"https://example.com/mygroup1/myproject{i}.git"
             )
             assert repo["remotes"][0]["type"] == "https"
+
+        assert repo["remotes"][0]["name"] == "origin"
 
 
 @pytest.mark.parametrize("provider", PROVIDERS)
@@ -598,11 +595,7 @@ def test_repos_find_remote_user_and_group(
                     groups = ["mygroup1"]\n
                 """
 
-                if use_owner:
-                    cfg += "owner = true\n"
-                else:
-                    cfg += 'users = ["myuser1"]\n'
-
+                cfg += "owner = true\n" if use_owner else 'users = ["myuser1"]\n'
                 f.write(cfg)
 
             args = ["repos", "find", "config", "--config", config.name]
@@ -623,10 +616,7 @@ def test_repos_find_remote_user_and_group(
             "--group",
             "mygroup1",
         ]
-        if use_owner:
-            args += ["--owner"]
-        else:
-            args += ["--user", "myuser1"]
+        args += ["--owner"] if use_owner else ["--user", "myuser1"]
         if not worktree_default:
             args += ["--worktree", str(worktree).lower()]
         if force_ssh:

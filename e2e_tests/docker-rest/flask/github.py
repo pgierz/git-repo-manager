@@ -80,7 +80,7 @@ def github_user_repos(user):
 @app.route("/github/orgs/<string:group>/repos/")
 def github_group_repos(group):
     check_headers()
-    if not (request.args.get("type") == "all"):
+    if request.args.get("type") != "all":
         abort(500, "wrong arguments")
     if group == "mygroup1":
         return single_namespaced_projects("mygroup1")
